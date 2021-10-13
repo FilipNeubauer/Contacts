@@ -1,6 +1,6 @@
 from sqlite3.dbapi2 import Cursor
 from tkinter import Entry, Frame, Listbox, Scrollbar, Tk, Toplevel, ttk, END
-from tkinter.constants import BOTH, LEFT, RIGHT
+from tkinter.constants import ACTIVE, BOTH, LEFT, RIGHT, SINGLE
 import sqlite3
 
 class App:
@@ -13,7 +13,7 @@ class App:
 
 
         self.add_contacts = ttk.Button(self.master, text="Add contact", padding=(10, 5), width=15, command=self.add_contact_fun)
-        self.edit_contacts = ttk.Button(self.master, text="Edit contacts", padding=(10, 5), width=15)
+        self.edit_contacts = ttk.Button(self.master, text="Edit contacts", padding=(10, 5), width=15, command=self.edit_contact)
         self.delete_contact = ttk.Button(self.master, text="Delete contact", padding=(10, 5), width=15)
         self.filter_contact = ttk.Button(self.master, text="A-Z", padding=(10, 5), width=15)
         self.search_contact = ttk.Entry(self.master)
@@ -27,8 +27,8 @@ class App:
         self.show.grid(row=2, column=3, padx=5)
 
     def add_contact_fun(self):
-        self.add_window = Toplevel(self.master)
-        self.add = Add(self.add_window, self.frame)
+        add_window = Toplevel(self.master)
+        add = Add(add_window, self.frame)
 
         
     def show_records(self):
@@ -44,12 +44,22 @@ class App:
         self.scrollbar = ttk.Scrollbar(self.frame)
         self.scrollbar.pack(side=RIGHT)
 
-        my_list = Listbox(self.frame, yscrollcommand=self.scrollbar.set, width=50)
+        self.my_list = Listbox(self.frame, yscrollcommand=self.scrollbar.set, width=50, selectmode=SINGLE)
         for i in records:
-            my_list.insert(END, "" + str(i))
-        my_list.pack()
-        self.scrollbar.config( command = my_list.yview)
+            self.my_list.insert(END, "" + str(i))
+        self.my_list.pack()
+        self.scrollbar.config( command = self.my_list.yview)
 
+    
+    def edit_contact(self):
+        for widgets in self.frame.winfo_children():
+            widgets.destroy()
+        self.show_records()
+        selected_contact = self.my_list.get(ACTIVE)
+        edit_window = Toplevel(self.master)
+        edit = Edit(edit_window, self.frame, selected_contact)
+
+        
 
 
 class Add(App):
@@ -110,6 +120,48 @@ class Add(App):
         self.show_records()
 
         self.master.destroy()
+
+
+class Edit(App):
+    def __init__(self, master, frame, record):
+        self.frame = frame
+        self.master = master
+        self.record = record
+        master.title("Edit contact")
+
+
+        self.edit_button = ttk.Button(self.master, text="Edit")
+        
+        self.edit_button.grid(row=6, column=0, columnspan=2)
+
+        self.name_label = ttk.Label(self.master, text="First name")
+        self.surname_label = ttk.Label(self.master, text="Last name")
+        self.birthday_label = ttk.Label(self.master, text="Birthday")
+        self.email_label = ttk.Label(self.master, text="Email")
+        self.phone_label = ttk.Label(self.master, text="Phone number")
+        self.note_label = ttk.Label(self.master, text="Note")
+
+        self.name_label.grid(row=0, column=0)
+        self.surname_label.grid(row=1, column=0)
+        self.birthday_label.grid(row=2, column=0)
+        self.email_label.grid(row=3, column=0)
+        self.phone_label.grid(row=4, column=0)
+        self.note_label.grid(row=5, column=0)
+
+        self.name_entry = ttk.Entry(self.master, )
+        self.surname_entry = ttk.Entry(self.master)
+        self.birthday_entry = ttk.Entry(self.master)
+        self.email_entry = ttk.Entry(self.master)
+        self.phone_entry = ttk.Entry(self.master)
+        self.note_entry = ttk.Entry(self.master)
+
+        self.name_entry.grid(row=0, column=1)
+        self.surname_entry.grid(row=1, column=1)
+        self.birthday_entry.grid(row=2, column=1)
+        self.email_entry.grid(row=3, column=1)
+        self.phone_entry.grid(row=4, column=1)
+        self.note_entry.grid(row=5, column=1)
+
 
 
 # conn = sqlite3.connect("Contacts.db")
