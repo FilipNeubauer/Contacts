@@ -47,6 +47,10 @@ class Add(App):
         self.master = master
         master.title("Add contact")
 
+        self.add_button = ttk.Button(self.master, text="Add", command=self.add_contact)
+        
+        self.add_button.grid(row=6, column=0, columnspan=2)
+
         self.name_label = ttk.Label(self.master, text="First name")
         self.surname_label = ttk.Label(self.master, text="Last name")
         self.birthday_label = ttk.Label(self.master, text="Birthday")
@@ -75,16 +79,47 @@ class Add(App):
         self.phone_entry.grid(row=4, column=1)
         self.note_entry.grid(row=5, column=1)
 
+    def add_contact(self):
+        conn = sqlite3.connect("Contacts.db")
+        cursor = conn.cursor()
+
+        cursor.execute("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?)", 
+                    (self.name_entry.get(),
+                    self.surname_entry.get(),
+                    self.birthday_entry.get(),
+                    self.email_entry.get(),
+                    self.phone_entry.get(),
+                    self.note_entry.get()))
+
+        conn.commit()
+        conn.close()
+
+        self.master.destroy()
 
 
 
 
 
 
-        #self.name_entry = ttk.Entry(self.master)
 
 
-    
+
+
+
+# conn = sqlite3.connect("Contacts.db")
+# cursor = conn.cursor()
+
+# cursor.execute("""CREATE TABLE records (
+#             name text,
+#             surname text,
+#             birthday text,
+#             email text,
+#             phone text,
+#             note text
+# )""")
+
+# conn.commit()
+# conn.close()
         
 root = Tk()
 app = App(root)
