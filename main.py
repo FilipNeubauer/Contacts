@@ -1,3 +1,4 @@
+from sqlite3.dbapi2 import Cursor
 from tkinter import Entry, Frame, Listbox, Scrollbar, Tk, Toplevel, ttk, END
 from tkinter.constants import BOTH, LEFT, RIGHT
 import sqlite3
@@ -7,19 +8,8 @@ class App:
         self.master = master
         master.title("Contact manager")
 
-        frame = ttk.Frame(self.master)
-        frame.grid(row=0, column=0, columnspan=4)
-
-        idk_list = [i for i in range(9)]
-
-        self.scrollbar = ttk.Scrollbar(frame)
-        self.scrollbar.pack(side=RIGHT)
-
-        my_list = Listbox(frame, yscrollcommand=self.scrollbar.set, width=50)
-        for i in idk_list:
-            my_list.insert(END, "" + str(i))
-        my_list.pack()
-        self.scrollbar.config( command = my_list.yview)
+        self.frame = ttk.Frame(self.master)
+        self.show_records()
 
 
         self.add_contacts = ttk.Button(self.master, text="Add contact", padding=(10, 5), width=15, command=self.add_contact_fun)
@@ -38,14 +28,36 @@ class App:
 
     def add_contact_fun(self):
         self.add_window = Toplevel(self.master)
-        self.add = Add(self.add_window)
+        self.add = Add(self.add_window, self.frame)
+
+        
+    def show_records(self):
+        conn = sqlite3.connect("Contacts.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM records")
+        records = map(lambda x: " ".join(x), cursor.fetchall())   # list of tuples
+        conn.commit()
+        conn.close()
+
+        self.frame.grid(row=0, column=0, columnspan=4)
+
+        self.scrollbar = ttk.Scrollbar(self.frame)
+        self.scrollbar.pack(side=RIGHT)
+
+        my_list = Listbox(self.frame, yscrollcommand=self.scrollbar.set, width=50)
+        for i in records:
+            my_list.insert(END, "" + str(i))
+        my_list.pack()
+        self.scrollbar.config( command = my_list.yview)
 
 
 
 class Add(App):
-    def __init__(self, master):
+    def __init__(self, master, frame):
+        self.frame = frame
         self.master = master
         master.title("Add contact")
+
 
         self.add_button = ttk.Button(self.master, text="Add", command=self.add_contact)
         
@@ -90,20 +102,14 @@ class Add(App):
                     self.email_entry.get(),
                     self.phone_entry.get(),
                     self.note_entry.get()))
-
         conn.commit()
         conn.close()
 
+        for widgets in self.frame.winfo_children():
+            widgets.destroy()
+        self.show_records()
+
         self.master.destroy()
-
-
-
-
-
-
-
-
-
 
 
 # conn = sqlite3.connect("Contacts.db")
