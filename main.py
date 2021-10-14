@@ -53,9 +53,8 @@ class App:
     
     def edit_contact(self):
         selected_contact = self.my_list.get(ANCHOR)
-        print(selected_contact)
         edit_window = Toplevel(self.master)
-        edit = Edit(edit_window, self.master, selected_contact)
+        edit = Edit(edit_window, self.master, selected_contact, self.my_list)
 
     def refresh_list(self):
         self.my_list.delete(0, END)
@@ -123,17 +122,18 @@ class Add(App):
 
 
 class Edit(App):
-    def __init__(self, master, frame, record):
+    def __init__(self, master, frame, id, my_list):
         self.frame = frame
         self.master = master
-        self.record = int(record[0])
+        self.id = int(id[0])
+        self.my_list = my_list
         master.title("Edit contact")
         
         self.fill()
 
 
 
-        self.edit_button = ttk.Button(self.master, text="Edit")
+        self.edit_button = ttk.Button(self.master, text="Edit", command=self.edit_button)
         
         self.edit_button.grid(row=6, column=0, columnspan=2)
 
@@ -177,7 +177,7 @@ class Edit(App):
     def fill(self):
         conn = sqlite3.connect("Contacts.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM records WHERE rowid=?", (self.record,))
+        cursor.execute("SELECT * FROM records WHERE rowid=?", (self.id,))
         self.records = [i for i in cursor.fetchall()[0]]
         
 
@@ -187,6 +187,32 @@ class Edit(App):
         self.email_already = self.records[3]
         self.phone_already = self.records[4]
         self.note_already = self.records[5]
+
+
+    def edit_button(self):
+        conn = sqlite3.connect("Contacts.db")
+        cursor = conn.cursor()
+
+        cursor.execute("""UPDATE records SET name=?,
+                        surname=?,
+                        birthday=?,
+                        email=?,
+                        phone=?,
+                        note=? WHERE rowid=?
+                    """,
+                    (self.name_entry.get(),
+                    self.surname_entry.get(),
+                    self.birthday_entry.get(),
+                    self.email_entry.get(),
+                    self.phone_entry.get(),
+                    self.note_entry.get(),
+                    self.id))
+        conn.commit()
+        conn.close()
+
+        self.refresh_list()
+
+        self.master.destroy()        
 
 
 
