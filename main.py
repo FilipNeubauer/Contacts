@@ -1,6 +1,6 @@
 from sqlite3.dbapi2 import Cursor
 from tkinter import Entry, Frame, Listbox, Scrollbar, Tk, Toplevel, ttk, END
-from tkinter.constants import ACTIVE, BOTH, LEFT, RIGHT, SINGLE
+from tkinter.constants import ACTIVE, ANCHOR, BOTH, LEFT, RIGHT, SINGLE
 import sqlite3
 
 class App:
@@ -8,7 +8,14 @@ class App:
         self.master = master
         master.title("Contact manager")
 
-        self.frame = ttk.Frame(self.master)
+        self.scrollbar = ttk.Scrollbar(self.master)
+        self.scrollbar.grid(row=0, column=4)
+
+        self.my_list = Listbox(self.master, yscrollcommand=self.scrollbar.set, width=50, selectmode=SINGLE)
+
+        self.my_list.grid(row=0, column=0, columnspan=3)
+        self.scrollbar.config( command = self.my_list.yview)
+
         self.show_records()
 
 
@@ -28,43 +35,38 @@ class App:
 
     def add_contact_fun(self):
         add_window = Toplevel(self.master)
-        add = Add(add_window, self.frame)
+        add = Add(add_window, self.my_list)
 
         
     def show_records(self):
         conn = sqlite3.connect("Contacts.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM records")
-        records = map(lambda x: " ".join(x), cursor.fetchall())   # list of tuples
+        cursor.execute("SELECT rowid, * FROM records")
+        records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())   # list of tuples
         conn.commit()
         conn.close()
-
-        self.frame.grid(row=0, column=0, columnspan=4)
-
-        self.scrollbar = ttk.Scrollbar(self.frame)
-        self.scrollbar.pack(side=RIGHT)
-
-        self.my_list = Listbox(self.frame, yscrollcommand=self.scrollbar.set, width=50, selectmode=SINGLE)
         for i in records:
-            self.my_list.insert(END, "" + str(i))
-        self.my_list.pack()
-        self.scrollbar.config( command = self.my_list.yview)
+            self.my_list.insert(END, str(i))
+        
+
 
     
     def edit_contact(self):
-        for widgets in self.frame.winfo_children():
-            widgets.destroy()
-        self.show_records()
-        selected_contact = self.my_list.get(ACTIVE)
+        selected_contact = self.my_list.get(ANCHOR)
+        print(selected_contact)
         edit_window = Toplevel(self.master)
-        edit = Edit(edit_window, self.frame, selected_contact)
+        edit = Edit(edit_window, self.master, selected_contact)
+
+    def refresh_list(self):
+        self.my_list.delete(0, END)
+        self.show_records()
 
         
 
 
 class Add(App):
-    def __init__(self, master, frame):
-        self.frame = frame
+    def __init__(self, master, my_list):
+        self.my_list = my_list
         self.master = master
         master.title("Add contact")
 
@@ -115,9 +117,7 @@ class Add(App):
         conn.commit()
         conn.close()
 
-        for widgets in self.frame.winfo_children():
-            widgets.destroy()
-        self.show_records()
+        self.refresh_list()
 
         self.master.destroy()
 
@@ -126,8 +126,11 @@ class Edit(App):
     def __init__(self, master, frame, record):
         self.frame = frame
         self.master = master
-        self.record = record
+        self.record = int(record[0])
         master.title("Edit contact")
+        
+        self.fill()
+
 
 
         self.edit_button = ttk.Button(self.master, text="Edit")
@@ -155,12 +158,36 @@ class Edit(App):
         self.phone_entry = ttk.Entry(self.master)
         self.note_entry = ttk.Entry(self.master)
 
+        self.name_entry.insert(0, self.name_already)
+        self.surname_entry.insert(0, self.surname_already)
+        self.birthday_entry.insert(0, self.birthday_already)
+        self.email_entry.insert(0, self.email_already)
+        self.phone_entry.insert(0, self.phone_already)
+        self.note_entry.insert(0, self.note_already)
+
+
         self.name_entry.grid(row=0, column=1)
         self.surname_entry.grid(row=1, column=1)
         self.birthday_entry.grid(row=2, column=1)
         self.email_entry.grid(row=3, column=1)
         self.phone_entry.grid(row=4, column=1)
         self.note_entry.grid(row=5, column=1)
+
+
+    def fill(self):
+        conn = sqlite3.connect("Contacts.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM records WHERE rowid=?", (self.record,))
+        self.records = [i for i in cursor.fetchall()[0]]
+        
+
+        self.name_already = self.records[0]
+        self.surname_already = self.records[1]
+        self.birthday_already = self.records[2]
+        self.email_already = self.records[3]
+        self.phone_already = self.records[4]
+        self.note_already = self.records[5]
+
 
 
 
