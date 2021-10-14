@@ -1,5 +1,5 @@
 from sqlite3.dbapi2 import Cursor
-from tkinter import Entry, Frame, Listbox, Scrollbar, Tk, Toplevel, ttk, END, messagebox
+from tkinter import Entry, Frame, Listbox, Scrollbar, StringVar, Tk, Toplevel, ttk, END, messagebox
 from tkinter.constants import ACTIVE, ANCHOR, BOTH, LEFT, RIGHT, SINGLE
 import sqlite3
 
@@ -22,7 +22,14 @@ class App:
         self.add_contacts = ttk.Button(self.master, text="Add contact", padding=(10, 5), width=15, command=self.add_contact_fun)
         self.edit_contacts = ttk.Button(self.master, text="Edit contacts", padding=(10, 5), width=15, command=self.edit_contact)
         self.delete_contact = ttk.Button(self.master, text="Delete contact", padding=(10, 5), width=15, command=self.delete_click)
-        self.filter_contact = ttk.Button(self.master, text="A-Z", padding=(10, 5), width=15)
+
+
+        self.options = ("A-Z", "Z-A", "from oldest", "from newest")
+        self.option_var = StringVar()
+
+
+        self.filter_contact = ttk.OptionMenu(self.master, self.option_var, self.options[0], *self.options)
+
         self.search_contact = ttk.Entry(self.master)
         self.show = ttk.Button(self.master, text="Show", padding=(10, 5), width=15)
 
@@ -76,7 +83,7 @@ class App:
 
             self.refresh_list()
 
-        
+    
 
 
 class Add(App):
@@ -119,22 +126,26 @@ class Add(App):
         self.note_entry.grid(row=5, column=1)
 
     def add_contact(self):
-        conn = sqlite3.connect("Contacts.db")
-        cursor = conn.cursor()
+        if len(self.name_entry.get()) < 1 or len(self.surname_entry.get()) < 1:
+            messagebox.showerror("Name and Surname", "Please enter Name and Surname!")
 
-        cursor.execute("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?)", 
-                    (self.name_entry.get(),
-                    self.surname_entry.get(),
-                    self.birthday_entry.get(),
-                    self.email_entry.get(),
-                    self.phone_entry.get(),
-                    self.note_entry.get()))
-        conn.commit()
-        conn.close()
+        else:
+            conn = sqlite3.connect("Contacts.db")
+            cursor = conn.cursor()
 
-        self.refresh_list()
+            cursor.execute("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?)", 
+                        (self.name_entry.get(),
+                        self.surname_entry.get(),
+                        self.birthday_entry.get(),
+                        self.email_entry.get(),
+                        self.phone_entry.get(),
+                        self.note_entry.get()))
+            conn.commit()
+            conn.close()
 
-        self.master.destroy()
+            self.refresh_list()
+
+            self.master.destroy()
 
 
 class Edit(App):
@@ -206,29 +217,32 @@ class Edit(App):
 
 
     def edit_button(self):
-        conn = sqlite3.connect("Contacts.db")
-        cursor = conn.cursor()
+        if len(self.name_entry.get()) < 1 or len(self.surname_entry.get()) < 1:
+            messagebox.showerror("Name and Surname", "Please enter Name and Surname!")
+        else:
+            conn = sqlite3.connect("Contacts.db")
+            cursor = conn.cursor()
 
-        cursor.execute("""UPDATE records SET name=?,
-                        surname=?,
-                        birthday=?,
-                        email=?,
-                        phone=?,
-                        note=? WHERE rowid=?
-                    """,
-                    (self.name_entry.get(),
-                    self.surname_entry.get(),
-                    self.birthday_entry.get(),
-                    self.email_entry.get(),
-                    self.phone_entry.get(),
-                    self.note_entry.get(),
-                    self.id))
-        conn.commit()
-        conn.close()
+            cursor.execute("""UPDATE records SET name=?,
+                            surname=?,
+                            birthday=?,
+                            email=?,
+                            phone=?,
+                            note=? WHERE rowid=?
+                        """,
+                        (self.name_entry.get(),
+                        self.surname_entry.get(),
+                        self.birthday_entry.get(),
+                        self.email_entry.get(),
+                        self.phone_entry.get(),
+                        self.note_entry.get(),
+                        self.id))
+            conn.commit()
+            conn.close()
 
-        self.refresh_list()
+            self.refresh_list()
 
-        self.master.destroy()        
+            self.master.destroy()        
 
 
 
@@ -247,7 +261,8 @@ class Edit(App):
 
 # conn.commit()
 # conn.close()
-        
-root = Tk()
-app = App(root)
-root.mainloop()
+
+if __name__ == "__main__":
+    root = Tk()
+    app = App(root)
+    root.mainloop()
