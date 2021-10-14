@@ -1,5 +1,5 @@
 from sqlite3.dbapi2 import Cursor
-from tkinter import Entry, Frame, Listbox, Scrollbar, Tk, Toplevel, ttk, END
+from tkinter import Entry, Frame, Listbox, Scrollbar, Tk, Toplevel, ttk, END, messagebox
 from tkinter.constants import ACTIVE, ANCHOR, BOTH, LEFT, RIGHT, SINGLE
 import sqlite3
 
@@ -21,7 +21,7 @@ class App:
 
         self.add_contacts = ttk.Button(self.master, text="Add contact", padding=(10, 5), width=15, command=self.add_contact_fun)
         self.edit_contacts = ttk.Button(self.master, text="Edit contacts", padding=(10, 5), width=15, command=self.edit_contact)
-        self.delete_contact = ttk.Button(self.master, text="Delete contact", padding=(10, 5), width=15)
+        self.delete_contact = ttk.Button(self.master, text="Delete contact", padding=(10, 5), width=15, command=self.delete_click)
         self.filter_contact = ttk.Button(self.master, text="A-Z", padding=(10, 5), width=15)
         self.search_contact = ttk.Entry(self.master)
         self.show = ttk.Button(self.master, text="Show", padding=(10, 5), width=15)
@@ -59,6 +59,22 @@ class App:
     def refresh_list(self):
         self.my_list.delete(0, END)
         self.show_records()
+
+
+    def delete_click(self):
+        selected_contact = self.my_list.get(ANCHOR)
+        selected_contact = selected_contact.split()
+        selected_contact = (int(selected_contact[0]), selected_contact[1], selected_contact[2])
+        response = messagebox.askquestion("Delete", "Do you want to delete {}?".format(selected_contact[1] + " " + selected_contact[2]))
+        if response == "yes":
+            id = selected_contact[0]
+            conn = sqlite3.connect("Contacts.db")
+            cursor = conn.cursor()
+            cursor.execute("DELETE from records WHERE rowid=?", (id,))
+            conn.commit()
+            conn.close()
+
+            self.refresh_list()
 
         
 
