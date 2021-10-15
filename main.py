@@ -2,6 +2,7 @@ from sqlite3.dbapi2 import Cursor
 from tkinter import Entry, Frame, Listbox, Scrollbar, StringVar, Tk, Toplevel, ttk, END, messagebox
 from tkinter.constants import ACTIVE, ANCHOR, BOTH, LEFT, RIGHT, SINGLE
 import sqlite3
+import re
 
 class App:
     def __init__(self, master):
@@ -128,24 +129,41 @@ class Add(App):
     def add_contact(self):
         if len(self.name_entry.get()) < 1 or len(self.surname_entry.get()) < 1:
             messagebox.showerror("Name and Surname", "Please enter Name and Surname!")
+            return None
 
-        else:
-            conn = sqlite3.connect("Contacts.db")
-            cursor = conn.cursor()
+        for i in str(self.phone_entry.get()):
+            if i not in (" ", "+", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"):
+                messagebox.showerror("Phone Number", "You can only use '+', spaces and digits!")
+                return None
 
-            cursor.execute("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?)", 
-                        (self.name_entry.get(),
-                        self.surname_entry.get(),
-                        self.birthday_entry.get(),
-                        self.email_entry.get(),
-                        self.phone_entry.get(),
-                        self.note_entry.get()))
-            conn.commit()
-            conn.close()
+        if len(self.email_entry.get()) > 0:
+            self.regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$' 
+            if self.check(self.email_entry.get()) == False:
+                messagebox.showerror("Email", "Invalid email")
+                return None
 
-            self.refresh_list()
+        conn = sqlite3.connect("Contacts.db")
+        cursor = conn.cursor()
 
-            self.master.destroy()
+        cursor.execute("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?)", 
+                    (self.name_entry.get(),
+                    self.surname_entry.get(),
+                    self.birthday_entry.get(),
+                    self.email_entry.get(),
+                    self.phone_entry.get(),
+                    self.note_entry.get()))
+        conn.commit()
+        conn.close()
+
+        self.refresh_list()
+
+        self.master.destroy()
+
+    def check(self, email):
+        if(re.search(self.regex, email)):   
+            return True
+        else:   
+            return False
 
 
 class Edit(App):
@@ -219,30 +237,49 @@ class Edit(App):
     def edit_button(self):
         if len(self.name_entry.get()) < 1 or len(self.surname_entry.get()) < 1:
             messagebox.showerror("Name and Surname", "Please enter Name and Surname!")
-        else:
-            conn = sqlite3.connect("Contacts.db")
-            cursor = conn.cursor()
+            return None
 
-            cursor.execute("""UPDATE records SET name=?,
-                            surname=?,
-                            birthday=?,
-                            email=?,
-                            phone=?,
-                            note=? WHERE rowid=?
-                        """,
-                        (self.name_entry.get(),
-                        self.surname_entry.get(),
-                        self.birthday_entry.get(),
-                        self.email_entry.get(),
-                        self.phone_entry.get(),
-                        self.note_entry.get(),
-                        self.id))
-            conn.commit()
-            conn.close()
+        for i in str(self.phone_entry.get()):
+            if i not in (" ", "+", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"):
+                messagebox.showerror("Phone", "You can only use '+', spaces and digits!")
+                return None
 
-            self.refresh_list()
+        if len(self.email_entry.get()) > 0:
+            self.regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$' 
+            if self.check(self.email_entry.get()) == False:
+                messagebox.showerror("Email", "Invalid email")
+                return None
 
-            self.master.destroy()        
+        conn = sqlite3.connect("Contacts.db")
+        cursor = conn.cursor()
+
+        cursor.execute("""UPDATE records SET name=?,
+                        surname=?,
+                        birthday=?,
+                        email=?,
+                        phone=?,
+                        note=? WHERE rowid=?
+                    """,
+                    (self.name_entry.get(),
+                    self.surname_entry.get(),
+                    self.birthday_entry.get(),
+                    self.email_entry.get(),
+                    self.phone_entry.get(),
+                    self.note_entry.get(),
+                    self.id))
+        conn.commit()
+        conn.close()
+
+        self.refresh_list()
+
+        self.master.destroy()    
+
+
+    def check(self, email):
+        if(re.search(self.regex, email)):   
+            return True
+        else:   
+            return False   
 
 
 
