@@ -47,7 +47,7 @@ class App:
 
     def add_contact_fun(self):
         add_window = Toplevel(self.master)
-        add = Add(add_window, self.my_list)
+        add = Add(add_window, self.my_list, self.option_var)
 
         
     def show_records(self):
@@ -100,7 +100,7 @@ class App:
     def edit_contact(self):
         selected_contact = self.my_list.get(ANCHOR)
         edit_window = Toplevel(self.master)
-        edit = Edit(edit_window, self.master, selected_contact, self.my_list)
+        edit = Edit(edit_window, self.master, selected_contact, self.my_list, self.option_var)
 
     def refresh_list(self, *args):
         self.my_list.delete(0, END)
@@ -126,7 +126,8 @@ class App:
 
 
 class Add(App):
-    def __init__(self, master, my_list):
+    def __init__(self, master, my_list, option_var):
+        self.option_var = option_var
         self.my_list = my_list
         self.master = master
         master.title("Add contact")
@@ -214,7 +215,8 @@ class Add(App):
 
 
 class Edit(App):
-    def __init__(self, master, frame, id, my_list):
+    def __init__(self, master, frame, id, my_list, option_var):
+        self.option_var = option_var
         self.frame = frame
         self.master = master
         self.id = int(id[0])
