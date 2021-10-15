@@ -3,6 +3,7 @@ from tkinter import Entry, Frame, Listbox, Scrollbar, StringVar, Tk, Toplevel, t
 from tkinter.constants import ACTIVE, ANCHOR, BOTH, LEFT, RIGHT, SINGLE
 import sqlite3
 import re
+from datetime import datetime
 
 class App:
     def __init__(self, master):
@@ -142,6 +143,15 @@ class Add(App):
                 messagebox.showerror("Email", "Invalid email")
                 return None
 
+        if len(str(self.birthday_entry.get())) > 0:
+            format = "%d.%m.%Y"
+            date = str(self.birthday_entry.get())
+            try:
+                datetime.strptime(date, format)
+            except:
+                messagebox.showerror("Birthday", "Invalid birthday format.\nPlease enter day.month.year format without spaces.")
+                return None
+
         conn = sqlite3.connect("Contacts.db")
         cursor = conn.cursor()
 
@@ -248,6 +258,15 @@ class Edit(App):
             self.regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$' 
             if self.check(self.email_entry.get()) == False:
                 messagebox.showerror("Email", "Invalid email")
+                return None
+
+        if len(str(self.birthday_entry.get())) > 0:
+            format = "%d.%m.%Y"
+            date = str(self.birthday_entry.get())
+            try:
+                datetime.strptime(date, format)
+            except:
+                messagebox.showerror("Birthday", "Invalid birthday format.\nPlease enter day.month.year format without spaces.")
                 return None
 
         conn = sqlite3.connect("Contacts.db")
