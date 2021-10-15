@@ -10,6 +10,17 @@ class App:
         self.master = master
         master.title("Contact manager")
 
+
+
+        self.add_contacts = ttk.Button(self.master, text="Add contact", padding=(10, 5), width=15, command=self.add_contact_fun)
+        self.edit_contacts = ttk.Button(self.master, text="Edit contacts", padding=(10, 5), width=15, command=self.edit_contact)
+        self.delete_contact = ttk.Button(self.master, text="Delete contact", padding=(10, 5), width=15, command=self.delete_click)
+
+
+        self.options = ("A-Z", "Z-A", "from oldest", "from newest")
+        self.option_var = StringVar(self.master)
+        self.filter_contact = ttk.OptionMenu(self.master, self.option_var, self.options[0], *self.options, command=self.refresh_list)
+
         self.scrollbar = ttk.Scrollbar(self.master)
         self.scrollbar.grid(row=0, column=4)
 
@@ -21,16 +32,8 @@ class App:
         self.show_records()
 
 
-        self.add_contacts = ttk.Button(self.master, text="Add contact", padding=(10, 5), width=15, command=self.add_contact_fun)
-        self.edit_contacts = ttk.Button(self.master, text="Edit contacts", padding=(10, 5), width=15, command=self.edit_contact)
-        self.delete_contact = ttk.Button(self.master, text="Delete contact", padding=(10, 5), width=15, command=self.delete_click)
 
-
-        self.options = ("A-Z", "Z-A", "from oldest", "from newest")
-        self.option_var = StringVar()
-
-
-        self.filter_contact = ttk.OptionMenu(self.master, self.option_var, self.options[0], *self.options)
+        
 
         self.search_contact = ttk.Entry(self.master)
         self.show = ttk.Button(self.master, text="Show", padding=(10, 5), width=15)
@@ -48,14 +51,48 @@ class App:
 
         
     def show_records(self):
-        conn = sqlite3.connect("Contacts.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT rowid, * FROM records")
-        records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())   # list of tuples
-        conn.commit()
-        conn.close()
-        for i in records:
-            self.my_list.insert(END, str(i))
+        order_var = self.option_var.get()
+        if order_var == "from oldest":
+            conn = sqlite3.connect("Contacts.db")
+            cursor = conn.cursor()
+            cursor.execute("SELECT rowid, * FROM records ORDER BY rowid")
+            records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())   # list of tuples
+            conn.commit()
+            conn.close()
+            for i in records:
+                self.my_list.insert(END, str(i))
+
+        if order_var == "A-Z":
+            conn = sqlite3.connect("Contacts.db")
+            cursor = conn.cursor()
+            cursor.execute("SELECT rowid, * FROM records ORDER BY name")
+            records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())   # list of tuples
+            conn.commit()
+            conn.close()
+            for i in records:
+                self.my_list.insert(END, str(i))
+
+        if order_var == "Z-A":
+            conn = sqlite3.connect("Contacts.db")
+            cursor = conn.cursor()
+            cursor.execute("SELECT rowid, * FROM records ORDER BY name DESC")
+            records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())   # list of tuples
+            conn.commit()
+            conn.close()
+            for i in records:
+                self.my_list.insert(END, str(i))
+
+        if order_var == "from newest":
+            conn = sqlite3.connect("Contacts.db")
+            cursor = conn.cursor()
+            cursor.execute("SELECT rowid, * FROM records ORDER BY rowid DESC")
+            records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())   # list of tuples
+            conn.commit()
+            conn.close()
+            for i in records:
+                self.my_list.insert(END, str(i))
+
+
         
 
 
@@ -65,7 +102,7 @@ class App:
         edit_window = Toplevel(self.master)
         edit = Edit(edit_window, self.master, selected_contact, self.my_list)
 
-    def refresh_list(self):
+    def refresh_list(self, *args):
         self.my_list.delete(0, END)
         self.show_records()
 
