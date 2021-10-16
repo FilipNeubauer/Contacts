@@ -11,7 +11,26 @@ class App:
         self.master = master
         master.title("Contact manager")
 
+        self.dict = {"name":1, 
+        "surname":1, 
+        "birhtday":1,
+        "email":1,
+        "phone":1,
+        "note":1}
 
+        self.name_var = IntVar()
+        self.surname_var = IntVar()
+        self.birthday_var = IntVar()
+        self.email_var = IntVar()
+        self.phone_var = IntVar()
+        self.note_var = IntVar()
+
+        self.name_var.set(1)
+        self.surname_var.set(1)
+        self.birthday_var.set(1)
+        self.email_var.set(1)
+        self.phone_var.set(1)
+        self.note_var.set(1)
 
         self.add_contacts = ttk.Button(self.master, text="Add contact", padding=(10, 5), width=15, command=self.add_contact_fun)
         self.edit_contacts = ttk.Button(self.master, text="Edit contacts", padding=(10, 5), width=15, command=self.edit_contact)
@@ -52,7 +71,11 @@ class App:
 
     def add_contact_fun(self):
         add_window = Toplevel(self.master)
-        add = Add(add_window, self.my_list, self.option_var)
+        add = Add(add_window, self.my_list, self.option_var, self.name_var, self.surname_var,
+        self.birthday_var,
+        self.email_var,
+        self.phone_var,
+        self.note_var)
 
         
     def show_records(self):
@@ -61,41 +84,58 @@ class App:
             conn = sqlite3.connect("Contacts.db")
             cursor = conn.cursor()
             cursor.execute("SELECT rowid, * FROM records ORDER BY rowid")
-            records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())   # list of tuples
+            records = cursor.fetchall()   # list of tuples
             conn.commit()
             conn.close()
-            for i in records:
-                self.my_list.insert(END, str(i))
+
 
         if order_var == "A-Z":
             conn = sqlite3.connect("Contacts.db")
             cursor = conn.cursor()
             cursor.execute("SELECT rowid, * FROM records ORDER BY name")
-            records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())   # list of tuples
+            records = cursor.fetchall()   # list of tuples
             conn.commit()
             conn.close()
-            for i in records:
-                self.my_list.insert(END, str(i))
+
 
         if order_var == "Z-A":
             conn = sqlite3.connect("Contacts.db")
             cursor = conn.cursor()
             cursor.execute("SELECT rowid, * FROM records ORDER BY name DESC")
-            records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())   # list of tuples
+            records = cursor.fetchall()   # list of tuples
             conn.commit()
             conn.close()
-            for i in records:
-                self.my_list.insert(END, str(i))
+
 
         if order_var == "from newest":
             conn = sqlite3.connect("Contacts.db")
             cursor = conn.cursor()
             cursor.execute("SELECT rowid, * FROM records ORDER BY rowid DESC")
-            records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())   # list of tuples
+            records = cursor.fetchall()   # list of tuples
             conn.commit()
             conn.close()
-            for i in records:
-                self.my_list.insert(END, str(i))
+        
+
+
+        for i in records:       # records = list of tuples  
+            x = []
+            x.append(str(i[0]))
+            if self.name_var.get() == 1:
+                x.append(str(i[1]))
+            if self.surname_var.get() == 1:
+                x.append(str(i[2]))
+            if self.birthday_var.get() == 1:
+                x.append(str(i[3]))
+            if self.email_var.get() == 1:
+                x.append(str(i[4]))
+            if self.phone_var.get() == 1:
+                x.append(str(i[5]))
+            if self.note_var.get() == 1:
+                x.append(str(i[6]))
+            x = "  ".join(x)
+            if len(x) == 1:
+                x = ""
+            self.my_list.insert(END, x)
 
 
         
@@ -105,7 +145,12 @@ class App:
     def edit_contact(self):
         selected_contact = self.my_list.get(ANCHOR)
         edit_window = Toplevel(self.master)
-        edit = Edit(edit_window, self.master, selected_contact, self.my_list, self.option_var)
+        edit = Edit(edit_window, self.master, selected_contact, self.my_list, self.option_var, self.name_var, 
+        self.surname_var,
+        self.birthday_var,
+        self.email_var,
+        self.phone_var,
+        self.note_var)
 
     def refresh_list(self, *args):
         self.my_list.delete(0, END)
@@ -159,14 +204,51 @@ class App:
 
 
     def show_data(self):
-        show_data = Toplevel(self.master)
-        show = Show(show_data)
+        self.show_window = Toplevel(self.master)
+        self.show_window.title("Show data")
+
+        
+    
+        self.check_name = ttk.Checkbutton(self.show_window, text="Name", variable=self.name_var, command=self.nothing)
+        self.check_surname = ttk.Checkbutton(self.show_window, text="Surname", variable=self.surname_var, command=self.nothing)
+        self.check_birthday = ttk.Checkbutton(self.show_window, text="Birthday", variable=self.birthday_var, command=self.nothing)
+        self.check_email = ttk.Checkbutton(self.show_window, text="Email", variable=self.email_var, command=self.nothing)
+        self.check_phone = ttk.Checkbutton(self.show_window, text="Phone", variable=self.phone_var, command=self.nothing)
+        self.check_note = ttk.Checkbutton(self.show_window, text="Note", variable=self.note_var, command=self.nothing)
+
+        self.apply_button = ttk.Button(self.show_window, text="Apply", command=self.apply)
+
+
+        self.check_name.pack()
+        self.check_surname.pack()
+        self.check_birthday.pack()
+        self.check_email.pack()
+        self.check_phone.pack()
+        self.check_note.pack()
+
+        self.apply_button.pack()
+
+
+    def nothing(self):
+        pass
+
+
+    def apply(self):
+        self.refresh_list()
+        self.show_window.destroy()
+        
 
     
 
 
 class Add(App):
-    def __init__(self, master, my_list, option_var):
+    def __init__(self, master, my_list, option_var, name_var, surname_var, birthday_var, email_var, phone_var, note_var):
+        self.name_var = name_var
+        self.surname_var = surname_var
+        self.birthday_var = birthday_var
+        self.email_var = email_var
+        self.phone_var = phone_var
+        self.note_var = note_var
         self.option_var = option_var
         self.my_list = my_list
         self.master = master
@@ -255,7 +337,13 @@ class Add(App):
 
 
 class Edit(App):
-    def __init__(self, master, frame, id, my_list, option_var):
+    def __init__(self, master, frame, id, my_list, option_var, name_var, surname_var, birthday_var, email_var, phone_var, note_var):
+        self.name_var = name_var
+        self.surname_var = surname_var
+        self.birthday_var = birthday_var
+        self.email_var = email_var
+        self.phone_var = phone_var
+        self.note_var = note_var
         self.option_var = option_var
         self.frame = frame
         self.master = master
@@ -380,45 +468,6 @@ class Edit(App):
             return False   
 
 
-class Show(App):
-    def __init__(self, window):
-        self.window = window
-        self.window.title("Data filetrs")
-
-        self.name_var = IntVar()
-        self.surname_var = IntVar()
-        self.birthday_var = IntVar()
-        self.email_var = IntVar()
-        self.phone_var = IntVar()
-        self.note_var = IntVar()
-
-        
-    
-
-
-
-        self.check_name = ttk.Checkbutton(self.window, text="Name", variable=self.name_var, command=self.nothing)
-        self.check_surname = ttk.Checkbutton(self.window, text="Surname", variable=self.surname_var, command=self.nothing)
-        self.check_birthday = ttk.Checkbutton(self.window, text="Birthday", variable=self.birthday_var, command=self.nothing)
-        self.check_email = ttk.Checkbutton(self.window, text="Email", variable=self.email_var, command=self.nothing)
-        self.check_phone = ttk.Checkbutton(self.window, text="Phone", variable=self.phone_var, command=self.nothing)
-        self.check_note = ttk.Checkbutton(self.window, text="Note", variable=self.note_var, command=self.nothing)
-
-        self.apply_button = ttk.Button(self.window, text="Apply")
-
-
-        self.check_name.pack()
-        self.check_surname.pack()
-        self.check_birthday.pack()
-        self.check_email.pack()
-        self.check_phone.pack()
-        self.check_note.pack()
-
-        self.apply_button.pack()
-
-
-    def nothing(self):
-        pass
 
 
 
