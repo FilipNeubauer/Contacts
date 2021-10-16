@@ -53,8 +53,6 @@ class App:
 
 
 
-        
-
         self.search_contact = ttk.Entry(self.master)
         self.show = ttk.Button(self.master, text="Show", padding=(10, 5), width=15, command=self.show_data)
 
@@ -132,7 +130,7 @@ class App:
                 x.append(str(i[5]))
             if self.note_var.get() == 1:
                 x.append(str(i[6]))
-            x = "  ".join(x)
+            x = " ".join(x)
             if len(x) == 1:
                 x = ""
             self.my_list.insert(END, x)
@@ -189,13 +187,13 @@ class App:
 
         val = event.widget.get()
         if val == '':
-            data = records
+            self.refresh_list()
         else:
             data = []
             for item in records:
                 if val.lower() in item.lower():
                     data.append(item)	
-        self.update(data)
+            self.update(data)
 
 
     def update(self, data):
