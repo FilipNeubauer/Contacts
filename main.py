@@ -143,14 +143,17 @@ class App:
 
     
     def edit_contact(self):
-        selected_contact = self.my_list.get(ANCHOR)
-        edit_window = Toplevel(self.master)
-        edit = Edit(edit_window, self.master, selected_contact, self.my_list, self.option_var, self.name_var, 
-        self.surname_var,
-        self.birthday_var,
-        self.email_var,
-        self.phone_var,
-        self.note_var)
+        if len(self.my_list.get(ANCHOR)) > 0:
+            selected_contact = self.my_list.get(ANCHOR)
+            edit_window = Toplevel(self.master)
+            edit = Edit(edit_window, self.master, selected_contact, self.my_list, self.option_var, self.name_var, 
+            self.surname_var,
+            self.birthday_var,
+            self.email_var,
+            self.phone_var,
+            self.note_var)
+        else:
+            pass
 
     def refresh_list(self, *args):
         self.my_list.delete(0, END)
