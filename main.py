@@ -11,12 +11,6 @@ class App:
         self.master = master
         master.title("Contact manager")
 
-        self.dict = {"name":1, 
-        "surname":1, 
-        "birhtday":1,
-        "email":1,
-        "phone":1,
-        "note":1}
 
         self.name_var = IntVar()
         self.surname_var = IntVar()
