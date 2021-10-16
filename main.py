@@ -1,6 +1,7 @@
 from sqlite3.dbapi2 import Cursor
-from tkinter import Entry, Frame, Listbox, Scrollbar, StringVar, Tk, Toplevel, ttk, END, messagebox
+from tkinter import *
 from tkinter.constants import ACTIVE, ANCHOR, BOTH, LEFT, RIGHT, SINGLE
+from tkinter import ttk, messagebox
 import sqlite3
 import re
 from datetime import datetime
@@ -27,7 +28,7 @@ class App:
         self.my_list = Listbox(self.master, yscrollcommand=self.scrollbar.set, width=50, selectmode=SINGLE)
 
         self.my_list.grid(row=0, column=0, columnspan=3)
-        self.scrollbar.config( command = self.my_list.yview)
+        self.scrollbar.config(command = self.my_list.yview)
 
         self.show_records()
 
@@ -36,7 +37,7 @@ class App:
         
 
         self.search_contact = ttk.Entry(self.master)
-        self.show = ttk.Button(self.master, text="Show", padding=(10, 5), width=15)
+        self.show = ttk.Button(self.master, text="Show", padding=(10, 5), width=15, command=self.show_data)
 
         self.add_contacts.grid(row=1, column=0, padx=5)
         self.edit_contacts.grid(row=1, column=1, padx=5)
@@ -155,6 +156,11 @@ class App:
 	    # put new data
 	    for item in data:
 		    self.my_list.insert('end', item)
+
+
+    def show_data(self):
+        show_data = Toplevel(self.master)
+        show = Show(show_data)
 
     
 
@@ -372,6 +378,49 @@ class Edit(App):
             return True
         else:   
             return False   
+
+
+class Show(App):
+    def __init__(self, window):
+        self.window = window
+        self.window.title("Data filetrs")
+
+        self.name_var = IntVar()
+        self.surname_var = IntVar()
+        self.birthday_var = IntVar()
+        self.email_var = IntVar()
+        self.phone_var = IntVar()
+        self.note_var = IntVar()
+
+        
+    
+
+
+
+        self.check_name = ttk.Checkbutton(self.window, text="Name", variable=self.name_var, command=self.nothing)
+        self.check_surname = ttk.Checkbutton(self.window, text="Surname", variable=self.surname_var, command=self.nothing)
+        self.check_birthday = ttk.Checkbutton(self.window, text="Birthday", variable=self.birthday_var, command=self.nothing)
+        self.check_email = ttk.Checkbutton(self.window, text="Email", variable=self.email_var, command=self.nothing)
+        self.check_phone = ttk.Checkbutton(self.window, text="Phone", variable=self.phone_var, command=self.nothing)
+        self.check_note = ttk.Checkbutton(self.window, text="Note", variable=self.note_var, command=self.nothing)
+
+        self.apply_button = ttk.Button(self.window, text="Apply")
+
+
+        self.check_name.pack()
+        self.check_surname.pack()
+        self.check_birthday.pack()
+        self.check_email.pack()
+        self.check_phone.pack()
+        self.check_note.pack()
+
+        self.apply_button.pack()
+
+
+    def nothing(self):
+        pass
+
+
 
 
 
