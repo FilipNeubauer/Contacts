@@ -112,19 +112,22 @@ class App:
 
 
     def delete_click(self):
-        selected_contact = self.my_list.get(ANCHOR)
-        selected_contact = selected_contact.split()
-        selected_contact = (int(selected_contact[0]), selected_contact[1], selected_contact[2])
-        response = messagebox.askquestion("Delete", "Do you want to delete {}?".format(selected_contact[1] + " " + selected_contact[2]))
-        if response == "yes":
-            id = selected_contact[0]
-            conn = sqlite3.connect("Contacts.db")
-            cursor = conn.cursor()
-            cursor.execute("DELETE from records WHERE rowid=?", (id,))
-            conn.commit()
-            conn.close()
+        try:
+            selected_contact = self.my_list.get(ANCHOR)
+            selected_contact = selected_contact.split()
+            selected_contact = (int(selected_contact[0]), selected_contact[1], selected_contact[2])
+            response = messagebox.askquestion("Delete", "Do you want to delete {}?".format(selected_contact[1] + " " + selected_contact[2]))
+            if response == "yes":
+                id = selected_contact[0]
+                conn = sqlite3.connect("Contacts.db")
+                cursor = conn.cursor()
+                cursor.execute("DELETE from records WHERE rowid=?", (id,))
+                conn.commit()
+                conn.close()
 
-            self.refresh_list()
+                self.refresh_list()
+        except:
+            pass
 
 
     def search(self, event):
