@@ -43,6 +43,10 @@ class App:
         self.delete_contact.grid(row=1, column=3, padx=5)
         self.filter_contact.grid(row=2, column=0, padx=5)
         self.search_contact.grid(row=2, column=1, padx=5)
+
+        self.search_contact.bind("<KeyRelease>", self.search)
+
+
         self.show.grid(row=2, column=3, padx=5)
 
     def add_contact_fun(self):
@@ -121,6 +125,33 @@ class App:
             conn.close()
 
             self.refresh_list()
+
+
+    def search(self, event):
+        conn = sqlite3.connect("Contacts.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT rowid, * FROM records ORDER BY rowid")
+        records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())   # list of tuples
+        conn.commit()
+        conn.close()
+
+        val = event.widget.get()
+        if val == '':
+            data = records
+        else:
+            data = []
+            for item in records:
+                if val.lower() in item.lower():
+                    data.append(item)	
+        self.update(data)
+
+
+    def update(self, data):
+	    self.my_list.delete(0, 'end')
+
+	    # put new data
+	    for item in data:
+		    self.my_list.insert('end', item)
 
     
 
