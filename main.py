@@ -4,12 +4,13 @@ from tkinter.constants import ACTIVE, ANCHOR, BOTH, LEFT, RIGHT, SINGLE
 from tkinter import ttk, messagebox
 import sqlite3
 import re
-from datetime import datetime
+from datetime import date, datetime
 
 class App:
     def __init__(self, master):
         self.master = master
         master.title("Contact manager")
+        
 
 
         self.name_var = IntVar()
@@ -60,6 +61,8 @@ class App:
 
 
         self.show.grid(row=2, column=3, padx=5)
+
+        self.birthday_pop()
 
     def add_contact_fun(self):
         add_window = Toplevel(self.master)
@@ -231,7 +234,23 @@ class App:
     def apply(self):
         self.refresh_list()
         self.show_window.destroy()
-        
+
+
+    def birthday_pop(self):
+        today = date.today()
+        today = today.strftime("%d.%m.%Y")
+        conn = sqlite3.connect("Contacts.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM records WHERE birthday = ?", (today,))
+        records = cursor.fetchall()   # list of tuples
+        conn.commit()
+        conn.close()       
+        if len(records) > 0:
+            birthday_persons = [str(i[0])+ " " + str(i[1]) for i in records]
+            for i in birthday_persons:
+                print(i)
+                messagebox.showinfo("Birthday", f"Today is birthday of {i}!")
+
 
     
 
@@ -302,9 +321,11 @@ class Add(App):
             format = "%d.%m.%Y"
             date = str(self.birthday_entry.get())
             try:
+                if len(date) != 10:
+                    raise
                 datetime.strptime(date, format)
             except:
-                messagebox.showerror("Birthday", "Invalid birthday format.\nPlease enter day.month.year format without spaces.")
+                messagebox.showerror("Birthday", "Invalid birthday format.\nPlease enter dd.mm.yyyy format without spaces.")
                 return None
 
         conn = sqlite3.connect("Contacts.db")
@@ -426,9 +447,11 @@ class Edit(App):
             format = "%d.%m.%Y"
             date = str(self.birthday_entry.get())
             try:
+                if len(date) != 10:
+                    raise
                 datetime.strptime(date, format)
             except:
-                messagebox.showerror("Birthday", "Invalid birthday format.\nPlease enter day.month.year format without spaces.")
+                messagebox.showerror("Birthday", "Invalid birthday format.\nPlease enter dd.mm.yyyy format without spaces.")
                 return None
 
         conn = sqlite3.connect("Contacts.db")
