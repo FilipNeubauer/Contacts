@@ -9,8 +9,12 @@ from datetime import date, datetime
 class App:
     def __init__(self, master):
         self.master = master
-        master.title("Contact manager")
-        
+        self.master.title("Contact manager")
+        self.master.call('wm', 'iconphoto', self.master._w, PhotoImage(file='contact.png'))
+        # self.master.geometry("500x300")
+        # self.master.maxsize(500, 300)
+        self.font = "Calibri 12"
+        self.button_font = "11"
 
 
         self.name_var = IntVar()
@@ -27,9 +31,9 @@ class App:
         self.phone_var.set(1)
         self.note_var.set(1)
 
-        self.add_contacts = ttk.Button(self.master, text="Add contact", padding=(10, 5), width=15, command=self.add_contact_fun)
-        self.edit_contacts = ttk.Button(self.master, text="Edit contacts", padding=(10, 5), width=15, command=self.edit_contact)
-        self.delete_contact = ttk.Button(self.master, text="Delete contact", padding=(10, 5), width=15, command=self.delete_click)
+        self.add_contacts = ttk.Button(self.master, text="Add contact", padding=(10, 5), width=20, command=self.add_contact_fun)
+        self.edit_contacts = ttk.Button(self.master, text="Edit contacts", padding=(10, 5), width=20, command=self.edit_contact)
+        self.delete_contact = ttk.Button(self.master, text="Delete contact", padding=(10, 5), width=20, command=self.delete_click)
 
 
         self.options = ("A-Z", "Z-A", "from oldest", "from newest")
@@ -37,23 +41,23 @@ class App:
         self.filter_contact = ttk.OptionMenu(self.master, self.option_var, self.options[0], *self.options, command=self.refresh_list)
 
         self.scrollbar = ttk.Scrollbar(self.master)
-        self.scrollbar.grid(row=0, column=4)
+        self.scrollbar.grid(row=0, column=4, sticky="ns", pady=5)
 
-        self.my_list = Listbox(self.master, yscrollcommand=self.scrollbar.set, width=50, selectmode=SINGLE)
+        self.my_list = Listbox(self.master, yscrollcommand=self.scrollbar.set, width=75, height=15, selectmode=SINGLE, font=self.font, activestyle="none")
 
-        self.my_list.grid(row=0, column=0, columnspan=3)
+        self.my_list.grid(row=0, column=0, columnspan=4, padx=(5, 0), pady=5)
         self.scrollbar.config(command = self.my_list.yview)
 
         self.show_records()
 
 
 
-        self.search_contact = ttk.Entry(self.master)
-        self.show = ttk.Button(self.master, text="Show", padding=(10, 5), width=15, command=self.show_data)
+        self.search_contact = ttk.Entry(self.master, width=23)
+        self.show = ttk.Button(self.master, text="Show", padding=(10, 5), width=20, command=self.show_data)
 
-        self.add_contacts.grid(row=1, column=0, padx=5)
-        self.edit_contacts.grid(row=1, column=1, padx=5)
-        self.delete_contact.grid(row=1, column=3, padx=5)
+        self.add_contacts.grid(row=1, column=0, padx=5, pady=(0, 5))
+        self.edit_contacts.grid(row=1, column=1, padx=5, pady=(0, 5))
+        self.delete_contact.grid(row=1, column=3, pady=(0, 5))
         self.filter_contact.grid(row=2, column=0, padx=5)
         self.search_contact.grid(row=2, column=1, padx=5)
 
@@ -141,7 +145,7 @@ class App:
         if len(self.my_list.get(ANCHOR)) > 0:
             selected_contact = self.my_list.get(ANCHOR)
             edit_window = Toplevel(self.master)
-            edit = Edit(edit_window, self.master, selected_contact, self.my_list, self.option_var, self.name_var, 
+            edit = Edit(edit_window, selected_contact, self.my_list, self.option_var, self.name_var, 
             self.surname_var,
             self.birthday_var,
             self.email_var,
@@ -204,8 +208,8 @@ class App:
     def show_data(self):
         self.show_window = Toplevel(self.master)
         self.show_window.title("Show data")
+        self.show_window.iconphoto(False, PhotoImage(file="contact.png"))
 
-        
     
         self.check_name = ttk.Checkbutton(self.show_window, text="Name", variable=self.name_var, command=self.nothing)
         self.check_surname = ttk.Checkbutton(self.show_window, text="Surname", variable=self.surname_var, command=self.nothing)
@@ -266,7 +270,8 @@ class Add(App):
         self.option_var = option_var
         self.my_list = my_list
         self.master = master
-        master.title("Add contact")
+        self.master.title("Add contact")
+        self.master.iconphoto(False, PhotoImage(file="contact.png"))
 
 
         self.add_button = ttk.Button(self.master, text="Add", command=self.add_contact)
@@ -353,7 +358,7 @@ class Add(App):
 
 
 class Edit(App):
-    def __init__(self, master, frame, id, my_list, option_var, name_var, surname_var, birthday_var, email_var, phone_var, note_var):
+    def __init__(self, master, id, my_list, option_var, name_var, surname_var, birthday_var, email_var, phone_var, note_var):
         self.name_var = name_var
         self.surname_var = surname_var
         self.birthday_var = birthday_var
@@ -361,11 +366,11 @@ class Edit(App):
         self.phone_var = phone_var
         self.note_var = note_var
         self.option_var = option_var
-        self.frame = frame
         self.master = master
         self.id = int(id[0])
         self.my_list = my_list
-        master.title("Edit contact")
+        self.master.title("Edit contact")
+        self.master.iconphoto(False, PhotoImage(file="contact.png"))
         
         self.fill()
 
