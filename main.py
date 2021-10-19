@@ -5,16 +5,20 @@ from tkinter import ttk, messagebox
 import sqlite3
 import re
 from datetime import date, datetime
+from typing import Collection
 
 class App:
     def __init__(self, master):
         self.master = master
         self.master.title("Contact manager")
         self.master.call('wm', 'iconphoto', self.master._w, PhotoImage(file='contact.png'))
-        # self.master.geometry("500x300")
-        # self.master.maxsize(500, 300)
+        self.master.geometry("626x390")
+        self.master.maxsize(626, 390)
+        self.master.minsize(626, 390)
         self.font = "Calibri 12"
-        self.button_font = "11"
+
+        self.frame = Frame(self.master)
+        self.frame.grid(row=1, column=0, columnspan=4)
 
 
         self.name_var = IntVar()
@@ -31,42 +35,44 @@ class App:
         self.phone_var.set(1)
         self.note_var.set(1)
 
-        self.add_contacts = ttk.Button(self.master, text="Add contact", padding=(10, 5), width=20, command=self.add_contact_fun)
-        self.edit_contacts = ttk.Button(self.master, text="Edit contacts", padding=(10, 5), width=20, command=self.edit_contact)
-        self.delete_contact = ttk.Button(self.master, text="Delete contact", padding=(10, 5), width=20, command=self.delete_click)
+        self.add_contacts = ttk.Button(self.frame, text="Add contact", padding=(10, 5), width=20, command=self.add_contact_fun)
+        self.edit_contacts = ttk.Button(self.frame, text="Edit contacts", padding=(10, 5), width=20, command=self.edit_contact)
+        self.delete_contact = ttk.Button(self.frame, text="Delete contact", padding=(10, 5), width=20, command=self.delete_click)
 
 
         self.options = ("A-Z", "Z-A", "from oldest", "from newest")
         self.option_var = StringVar(self.master)
-        self.filter_contact = ttk.OptionMenu(self.master, self.option_var, self.options[0], *self.options, command=self.refresh_list)
+        self.filter_contact = ttk.OptionMenu(self.frame, self.option_var, self.options[0], *self.options, command=self.refresh_list)
 
         self.scrollbar = ttk.Scrollbar(self.master)
-        self.scrollbar.grid(row=0, column=4, sticky="ns", pady=5)
+        self.scrollbar.grid(row=0, column=3, sticky="ns", pady=5)
 
         self.my_list = Listbox(self.master, yscrollcommand=self.scrollbar.set, width=75, height=15, selectmode=SINGLE, font=self.font, activestyle="none")
 
-        self.my_list.grid(row=0, column=0, columnspan=4, padx=(5, 0), pady=5)
+        self.my_list.grid(row=0, column=0, columnspan=3, padx=(5, 0), pady=5)
         self.scrollbar.config(command = self.my_list.yview)
 
         self.show_records()
 
 
 
-        self.search_contact = ttk.Entry(self.master, width=23)
-        self.show = ttk.Button(self.master, text="Show", padding=(10, 5), width=20, command=self.show_data)
+        self.search_contact = ttk.Entry(self.frame, width=23)
+        self.show = ttk.Button(self.frame, text="Show", padding=(10, 5), width=20, command=self.show_data)
 
-        self.add_contacts.grid(row=1, column=0, padx=5, pady=(0, 5))
-        self.edit_contacts.grid(row=1, column=1, padx=5, pady=(0, 5))
-        self.delete_contact.grid(row=1, column=3, pady=(0, 5))
-        self.filter_contact.grid(row=2, column=0, padx=5)
-        self.search_contact.grid(row=2, column=1, padx=5)
+        self.add_contacts.grid(row=0, column=0, padx=20, pady=(0, 5))
+        self.edit_contacts.grid(row=0, column=1, padx=20, pady=(0, 5))
+        self.delete_contact.grid(row=0, column=2, padx=20, pady=(0, 5))
+        self.filter_contact.grid(row=1, column=0, padx=20, pady=(0, 5))
+        self.search_contact.grid(row=1, column=1, padx=20, pady=(0, 5))
+        self.show.grid(row=1, column=2, padx=20, pady=(0, 5))
 
         self.search_contact.bind("<KeyRelease>", self.search)
 
 
-        self.show.grid(row=2, column=3, padx=5)
-
         self.birthday_pop()
+
+        #print(self.master.winfo_geometry())
+        #print(self.my_list.winfo_width())
 
     def add_contact_fun(self):
         add_window = Toplevel(self.master)
@@ -272,11 +278,14 @@ class Add(App):
         self.master = master
         self.master.title("Add contact")
         self.master.iconphoto(False, PhotoImage(file="contact.png"))
+        self.master.geometry("282x175")
+        self.master.maxsize(282, 175)
+        self.master.minsize(282, 175)
 
 
         self.add_button = ttk.Button(self.master, text="Add", command=self.add_contact)
         
-        self.add_button.grid(row=6, column=0, columnspan=2)
+        self.add_button.grid(row=6, column=0, columnspan=2, pady=(0, 3))
 
         self.name_label = ttk.Label(self.master, text="First name")
         self.surname_label = ttk.Label(self.master, text="Last name")
@@ -289,22 +298,22 @@ class Add(App):
         self.surname_label.grid(row=1, column=0)
         self.birthday_label.grid(row=2, column=0)
         self.email_label.grid(row=3, column=0)
-        self.phone_label.grid(row=4, column=0)
+        self.phone_label.grid(row=4, column=0, padx=(3, 0))
         self.note_label.grid(row=5, column=0)
 
-        self.name_entry = ttk.Entry(self.master)
-        self.surname_entry = ttk.Entry(self.master)
-        self.birthday_entry = ttk.Entry(self.master)
-        self.email_entry = ttk.Entry(self.master)
-        self.phone_entry = ttk.Entry(self.master)
-        self.note_entry = ttk.Entry(self.master)
+        self.name_entry = ttk.Entry(self.master, width=30)
+        self.surname_entry = ttk.Entry(self.master, width=30)
+        self.birthday_entry = ttk.Entry(self.master, width=30)
+        self.email_entry = ttk.Entry(self.master, width=30)
+        self.phone_entry = ttk.Entry(self.master, width=30)
+        self.note_entry = ttk.Entry(self.master, width=30)
 
-        self.name_entry.grid(row=0, column=1)
-        self.surname_entry.grid(row=1, column=1)
-        self.birthday_entry.grid(row=2, column=1)
-        self.email_entry.grid(row=3, column=1)
-        self.phone_entry.grid(row=4, column=1)
-        self.note_entry.grid(row=5, column=1)
+        self.name_entry.grid(row=0, column=1, padx=5, pady=3)
+        self.surname_entry.grid(row=1, column=1, padx=5, pady=(0,3))
+        self.birthday_entry.grid(row=2, column=1, padx=5, pady=(0,3))
+        self.email_entry.grid(row=3, column=1, padx=5, pady=(0,3))
+        self.phone_entry.grid(row=4, column=1, padx=5, pady=(0,3))
+        self.note_entry.grid(row=5, column=1, padx=5, pady=(0,3))
 
     def add_contact(self):
         if len(self.name_entry.get()) < 1 or len(self.surname_entry.get()) < 1:
