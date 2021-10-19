@@ -376,7 +376,7 @@ class Edit(App):
         self.note_var = note_var
         self.option_var = option_var
         self.master = master
-        self.id = int(id[0])
+        self.id = int(id.split()[0])
         self.my_list = my_list
         self.master.title("Edit contact")
         self.master.iconphoto(False, PhotoImage(file="contact.png"))
