@@ -1,11 +1,9 @@
-from sqlite3.dbapi2 import Cursor
 from tkinter import *
-from tkinter.constants import ACTIVE, ANCHOR, BOTH, LEFT, RIGHT, SINGLE
 from tkinter import ttk, messagebox
 import sqlite3
 import re
 from datetime import date, datetime
-from typing import Collection
+
 
 class App:
     def __init__(self, master):
@@ -19,7 +17,6 @@ class App:
 
         self.frame = Frame(self.master)
         self.frame.grid(row=1, column=0, columnspan=4)
-
 
         self.name_var = IntVar()
         self.surname_var = IntVar()
@@ -55,7 +52,6 @@ class App:
         self.show_records()
 
 
-
         self.search_contact = ttk.Entry(self.frame, width=23)
         self.show = ttk.Button(self.frame, text="Show", padding=(10, 5), width=20, command=self.show_data, takefocus=False)
 
@@ -71,8 +67,6 @@ class App:
 
         self.birthday_pop()
 
-        #print(self.master.winfo_geometry())
-        #print(self.my_list.winfo_width())
 
     def add_contact_fun(self):
         add_window = Toplevel(self.master)
@@ -93,7 +87,6 @@ class App:
             conn.commit()
             conn.close()
 
-
         if order_var == "A-Z":
             conn = sqlite3.connect("Contacts.db")
             cursor = conn.cursor()
@@ -101,7 +94,6 @@ class App:
             records = cursor.fetchall()   # list of tuples
             conn.commit()
             conn.close()
-
 
         if order_var == "Z-A":
             conn = sqlite3.connect("Contacts.db")
@@ -111,7 +103,6 @@ class App:
             conn.commit()
             conn.close()
 
-
         if order_var == "from newest":
             conn = sqlite3.connect("Contacts.db")
             cursor = conn.cursor()
@@ -120,8 +111,6 @@ class App:
             conn.commit()
             conn.close()
         
-
-
         for i in records:       # records = list of tuples  
             x = []
             x.append(str(i[0]))
@@ -143,10 +132,6 @@ class App:
             self.my_list.insert(END, x)
 
 
-        
-
-
-    
     def edit_contact(self):
         if len(self.my_list.get(ANCHOR)) > 0:
             selected_contact = self.my_list.get(ANCHOR)
@@ -159,6 +144,7 @@ class App:
             self.note_var)
         else:
             pass
+
 
     def refresh_list(self, *args):
         self.my_list.delete(0, END)
@@ -178,7 +164,6 @@ class App:
                 cursor.execute("DELETE from records WHERE rowid=?", (id,))
                 conn.commit()
                 conn.close()
-
                 self.refresh_list()
         except:
             pass
@@ -188,7 +173,7 @@ class App:
         conn = sqlite3.connect("Contacts.db")
         cursor = conn.cursor()
         cursor.execute("SELECT rowid, * FROM records ORDER BY rowid")
-        records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())   # list of tuples
+        records = map(lambda x: " ".join(map(str, x)), cursor.fetchall())
         conn.commit()
         conn.close()
 
@@ -205,8 +190,6 @@ class App:
 
     def update(self, data):
 	    self.my_list.delete(0, 'end')
-
-	    # put new data
 	    for item in data:
 		    self.my_list.insert('end', item)
 
@@ -239,7 +222,7 @@ class App:
         self.apply_button.grid(row=6, column=0, sticky="we", padx=35)
 
 
-    def nothing(self):
+    def nothing(self):      # bug fix checkbutton square
         pass
 
 
@@ -262,9 +245,6 @@ class App:
             for i in birthday_persons:
                 print(i)
                 messagebox.showinfo("Birthday", f"Today is birthday of {i}!")
-
-
-    
 
 
 class Add(App):
@@ -317,6 +297,7 @@ class Add(App):
         self.phone_entry.grid(row=4, column=1, padx=5, pady=(0,3))
         self.note_entry.grid(row=5, column=1, padx=5, pady=(0,3))
 
+
     def add_contact(self):
         if len(self.name_entry.get()) < 1 or len(self.surname_entry.get()) < 1:
             messagebox.showerror("Name and Surname", "Please enter Name and Surname!")
@@ -346,7 +327,6 @@ class Add(App):
 
         conn = sqlite3.connect("Contacts.db")
         cursor = conn.cursor()
-
         cursor.execute("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?)", 
                     (self.name_entry.get(),
                     self.surname_entry.get(),
@@ -358,8 +338,8 @@ class Add(App):
         conn.close()
 
         self.refresh_list()
-
         self.master.destroy()
+
 
     def check(self, email):
         if(re.search(self.regex, email)):   
@@ -387,7 +367,6 @@ class Edit(App):
         self.master.minsize(282, 175)
         
         self.fill()
-
 
 
         self.edit_button = ttk.Button(self.master, text="Edit", command=self.edit_button, takefocus=False)
@@ -422,7 +401,6 @@ class Edit(App):
         self.phone_entry.insert(0, self.phone_already)
         self.note_entry.insert(0, self.note_already)
 
-
         self.name_entry.grid(row=0, column=1, padx=5, pady=3)
         self.surname_entry.grid(row=1, column=1, padx=5, pady=(0,3))
         self.birthday_entry.grid(row=2, column=1, padx=5, pady=(0,3))
@@ -436,7 +414,6 @@ class Edit(App):
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM records WHERE rowid=?", (self.id,))
         self.records = [i for i in cursor.fetchall()[0]]
-        
 
         self.name_already = self.records[0]
         self.surname_already = self.records[1]
@@ -505,15 +482,9 @@ class Edit(App):
             return False   
 
 
-
-
-
-
-
 def table():
     conn = sqlite3.connect("Contacts.db")
     cursor = conn.cursor()
-
     cursor.execute("""CREATE TABLE IF NOT EXISTS records (
                 name text,
                 surname text,
@@ -526,8 +497,10 @@ def table():
     conn.commit()
     conn.close()
 
+
 if __name__ == "__main__":
     table()
     root = Tk()
     app = App(root)
     root.mainloop()
+
