@@ -12,7 +12,7 @@ class App:
         self.master = master
         self.master.title("Contact manager")
         self.master.call('wm', 'iconphoto', self.master._w, PhotoImage(file='contact.png'))
-        self.master.geometry("626x390")
+        self.master.geometry("626x390+323+195")
         self.master.maxsize(626, 390)
         self.master.minsize(626, 390)
         self.font = "Calibri 12"
@@ -35,9 +35,9 @@ class App:
         self.phone_var.set(1)
         self.note_var.set(1)
 
-        self.add_contacts = ttk.Button(self.frame, text="Add contact", padding=(10, 5), width=20, command=self.add_contact_fun)
-        self.edit_contacts = ttk.Button(self.frame, text="Edit contacts", padding=(10, 5), width=20, command=self.edit_contact)
-        self.delete_contact = ttk.Button(self.frame, text="Delete contact", padding=(10, 5), width=20, command=self.delete_click)
+        self.add_contacts = ttk.Button(self.frame, text="Add contact", padding=(10, 5), width=20, command=self.add_contact_fun, takefocus=False)
+        self.edit_contacts = ttk.Button(self.frame, text="Edit contacts", padding=(10, 5), width=20, command=self.edit_contact, takefocus=False)
+        self.delete_contact = ttk.Button(self.frame, text="Delete contact", padding=(10, 5), width=20, command=self.delete_click, takefocus=False)
 
 
         self.options = ("A-Z", "Z-A", "from oldest", "from newest")
@@ -57,7 +57,7 @@ class App:
 
 
         self.search_contact = ttk.Entry(self.frame, width=23)
-        self.show = ttk.Button(self.frame, text="Show", padding=(10, 5), width=20, command=self.show_data)
+        self.show = ttk.Button(self.frame, text="Show", padding=(10, 5), width=20, command=self.show_data, takefocus=False)
 
         self.add_contacts.grid(row=0, column=0, padx=20, pady=(0, 5))
         self.edit_contacts.grid(row=0, column=1, padx=20, pady=(0, 5))
@@ -213,28 +213,30 @@ class App:
 
     def show_data(self):
         self.show_window = Toplevel(self.master)
-        self.show_window.title("Show data")
+        self.show_window.title("Show")
         self.show_window.iconphoto(False, PhotoImage(file="contact.png"))
-
+        self.show_window.geometry("152x151")
+        self.show_window.maxsize(152, 151)
+        self.show_window.minsize(152, 151)
     
-        self.check_name = ttk.Checkbutton(self.show_window, text="Name", variable=self.name_var, command=self.nothing)
-        self.check_surname = ttk.Checkbutton(self.show_window, text="Surname", variable=self.surname_var, command=self.nothing)
-        self.check_birthday = ttk.Checkbutton(self.show_window, text="Birthday", variable=self.birthday_var, command=self.nothing)
-        self.check_email = ttk.Checkbutton(self.show_window, text="Email", variable=self.email_var, command=self.nothing)
-        self.check_phone = ttk.Checkbutton(self.show_window, text="Phone", variable=self.phone_var, command=self.nothing)
-        self.check_note = ttk.Checkbutton(self.show_window, text="Note", variable=self.note_var, command=self.nothing)
+        self.check_name = ttk.Checkbutton(self.show_window, text="Name", variable=self.name_var, command=self.nothing, takefocus=False)
+        self.check_surname = ttk.Checkbutton(self.show_window, text="Surname", variable=self.surname_var, command=self.nothing, takefocus=False)
+        self.check_birthday = ttk.Checkbutton(self.show_window, text="Birthday", variable=self.birthday_var, command=self.nothing, takefocus=False)
+        self.check_email = ttk.Checkbutton(self.show_window, text="Email", variable=self.email_var, command=self.nothing, takefocus=False)
+        self.check_phone = ttk.Checkbutton(self.show_window, text="Phone", variable=self.phone_var, command=self.nothing, takefocus=False)
+        self.check_note = ttk.Checkbutton(self.show_window, text="Note", variable=self.note_var, command=self.nothing, takefocus=False)
 
-        self.apply_button = ttk.Button(self.show_window, text="Apply", command=self.apply)
+        self.apply_button = ttk.Button(self.show_window, text="Apply", command=self.apply, takefocus=False)
 
 
-        self.check_name.pack()
-        self.check_surname.pack()
-        self.check_birthday.pack()
-        self.check_email.pack()
-        self.check_phone.pack()
-        self.check_note.pack()
+        self.check_name.grid(row=0, column=0, sticky="we", padx=35)
+        self.check_surname.grid(row=1, column=0, sticky="we", padx=35)
+        self.check_birthday.grid(row=2, column=0, sticky="we", padx=35)
+        self.check_email.grid(row=3, column=0, sticky="we", padx=35)
+        self.check_phone.grid(row=4, column=0, sticky="we", padx=35)
+        self.check_note.grid(row=5, column=0, sticky="we", padx=35)
 
-        self.apply_button.pack()
+        self.apply_button.grid(row=6, column=0, sticky="we", padx=35)
 
 
     def nothing(self):
@@ -283,7 +285,7 @@ class Add(App):
         self.master.minsize(282, 175)
 
 
-        self.add_button = ttk.Button(self.master, text="Add", command=self.add_contact)
+        self.add_button = ttk.Button(self.master, text="Add", command=self.add_contact, takefocus=False)
         
         self.add_button.grid(row=6, column=0, columnspan=2, pady=(0, 3))
 
@@ -380,14 +382,17 @@ class Edit(App):
         self.my_list = my_list
         self.master.title("Edit contact")
         self.master.iconphoto(False, PhotoImage(file="contact.png"))
+        self.master.geometry("282x175")
+        self.master.maxsize(282, 175)
+        self.master.minsize(282, 175)
         
         self.fill()
 
 
 
-        self.edit_button = ttk.Button(self.master, text="Edit", command=self.edit_button)
+        self.edit_button = ttk.Button(self.master, text="Edit", command=self.edit_button, takefocus=False)
         
-        self.edit_button.grid(row=6, column=0, columnspan=2)
+        self.edit_button.grid(row=6, column=0, columnspan=2, pady=(0, 3))
 
         self.name_label = ttk.Label(self.master, text="First name")
         self.surname_label = ttk.Label(self.master, text="Last name")
@@ -400,15 +405,15 @@ class Edit(App):
         self.surname_label.grid(row=1, column=0)
         self.birthday_label.grid(row=2, column=0)
         self.email_label.grid(row=3, column=0)
-        self.phone_label.grid(row=4, column=0)
+        self.phone_label.grid(row=4, column=0, padx=(3, 0))
         self.note_label.grid(row=5, column=0)
 
-        self.name_entry = ttk.Entry(self.master, )
-        self.surname_entry = ttk.Entry(self.master)
-        self.birthday_entry = ttk.Entry(self.master)
-        self.email_entry = ttk.Entry(self.master)
-        self.phone_entry = ttk.Entry(self.master)
-        self.note_entry = ttk.Entry(self.master)
+        self.name_entry = ttk.Entry(self.master, width=30)
+        self.surname_entry = ttk.Entry(self.master, width=30)
+        self.birthday_entry = ttk.Entry(self.master, width=30)
+        self.email_entry = ttk.Entry(self.master, width=30)
+        self.phone_entry = ttk.Entry(self.master, width=30)
+        self.note_entry = ttk.Entry(self.master, width=30)
 
         self.name_entry.insert(0, self.name_already)
         self.surname_entry.insert(0, self.surname_already)
@@ -418,12 +423,12 @@ class Edit(App):
         self.note_entry.insert(0, self.note_already)
 
 
-        self.name_entry.grid(row=0, column=1)
-        self.surname_entry.grid(row=1, column=1)
-        self.birthday_entry.grid(row=2, column=1)
-        self.email_entry.grid(row=3, column=1)
-        self.phone_entry.grid(row=4, column=1)
-        self.note_entry.grid(row=5, column=1)
+        self.name_entry.grid(row=0, column=1, padx=5, pady=3)
+        self.surname_entry.grid(row=1, column=1, padx=5, pady=(0,3))
+        self.birthday_entry.grid(row=2, column=1, padx=5, pady=(0,3))
+        self.email_entry.grid(row=3, column=1, padx=5, pady=(0,3))
+        self.phone_entry.grid(row=4, column=1, padx=5, pady=(0,3))
+        self.note_entry.grid(row=5, column=1, padx=5, pady=(0,3))
 
 
     def fill(self):
@@ -505,23 +510,24 @@ class Edit(App):
 
 
 
+def table():
+    conn = sqlite3.connect("Contacts.db")
+    cursor = conn.cursor()
 
-# conn = sqlite3.connect("Contacts.db")
-# cursor = conn.cursor()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS records (
+                name text,
+                surname text,
+                birthday text,
+                email text,
+                phone text,
+                note text
+    )""")
 
-# cursor.execute("""CREATE TABLE records (
-#             name text,
-#             surname text,
-#             birthday text,
-#             email text,
-#             phone text,
-#             note text
-# )""")
-
-# conn.commit()
-# conn.close()
+    conn.commit()
+    conn.close()
 
 if __name__ == "__main__":
+    table()
     root = Tk()
     app = App(root)
     root.mainloop()
