@@ -83,7 +83,7 @@ class App:
             conn = sqlite3.connect("Contacts.db")
             cursor = conn.cursor()
             cursor.execute("SELECT rowid, * FROM records ORDER BY rowid")
-            records = cursor.fetchall()   # list of tuples
+            records = cursor.fetchall()   
             conn.commit()
             conn.close()
 
@@ -91,7 +91,7 @@ class App:
             conn = sqlite3.connect("Contacts.db")
             cursor = conn.cursor()
             cursor.execute("SELECT rowid, * FROM records ORDER BY name")
-            records = cursor.fetchall()   # list of tuples
+            records = cursor.fetchall()   
             conn.commit()
             conn.close()
 
@@ -99,7 +99,7 @@ class App:
             conn = sqlite3.connect("Contacts.db")
             cursor = conn.cursor()
             cursor.execute("SELECT rowid, * FROM records ORDER BY name DESC")
-            records = cursor.fetchall()   # list of tuples
+            records = cursor.fetchall()   
             conn.commit()
             conn.close()
 
@@ -107,11 +107,11 @@ class App:
             conn = sqlite3.connect("Contacts.db")
             cursor = conn.cursor()
             cursor.execute("SELECT rowid, * FROM records ORDER BY rowid DESC")
-            records = cursor.fetchall()   # list of tuples
+            records = cursor.fetchall()   
             conn.commit()
             conn.close()
         
-        for i in records:       # records = list of tuples  
+        for i in records:         
             x = []
             x.append(str(i[0]))
             if self.name_var.get() == 1:
@@ -237,7 +237,7 @@ class App:
         conn = sqlite3.connect("Contacts.db")
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM records WHERE birthday = ?", (today,))
-        records = cursor.fetchall()   # list of tuples
+        records = cursor.fetchall()   
         conn.commit()
         conn.close()       
         if len(records) > 0:
